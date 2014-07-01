@@ -55,3 +55,4 @@
 .\Out\bsp.o: .\Hardware\led.h
 .\Out\bsp.o: .\Hardware\delay.h
 .\Out\bsp.o: .\Application\task.h
+.\Out\bsp.o: Main\console.h

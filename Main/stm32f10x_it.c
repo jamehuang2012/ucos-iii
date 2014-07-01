@@ -25,6 +25,9 @@
 #include "stm32f10x_it.h"
 #include "usart.h"	
 #include "delay.h"
+#include "core_cm3.h"
+#include "led.h"
+#include "includes.h"
 /** @addtogroup STM32F10x_StdPeriph_Examples
   * @{
   */
@@ -166,5 +169,51 @@ void PendSV_Handler(void)
 /**
   * @}
   */ 
+	
+
+extern ring_buffer uart_buffer;
+extern ring_buffer Uart_Rxbuffer;
+
+extern OS_SEM ConsoleSem;
+/********************************************************************
+                      ´®¿Ú1ÖÐ¶Ï
+********************************************************************/
+void USART1_IRQHandler(void)
+{
+	OS_ERR err;
+	int8_t ch;
+  if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
+  {
+    /* Read one byte from the receive data register */
+    ch = USART_ReceiveData(USART1);
+		LED_NF(0);
+		RB_push(&Uart_Rxbuffer,ch);
+		OSSemPost(&ConsoleSem,
+						OS_OPT_POST_1,
+						&err);
+    //if(RxCounter2 == NbrOfDataToRead1)
+    {
+      /* Disable the USART2 Receive interrupt */ 
+      //USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);
+    }
+  }
+  
+  if(USART_GetITStatus(USART1, USART_IT_TXE) != RESET)
+  {   
+    /* Write one byte to the transmit data register */
+	//	if (TxCount < NumOfSend)
+//		  USART_SendData(USART1, TxBuffer[TxCount++]);
+
+//    if(TxCount == NumOfSend)
+		ch = RB_pop(&uart_buffer);
+		if (ch >= 0) {
+			USART_SendData(USART1,(uint16_t)ch);
+		} else {
+      /* Disable the USART2 Transmit interrupt */
+      USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+    }
+  }
+}
+
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

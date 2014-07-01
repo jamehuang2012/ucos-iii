@@ -219,6 +219,10 @@ void USART_Init(USART_TypeDef* USARTx, USART_InitTypeDef* USART_InitStruct)
             USART_InitStruct->USART_Mode;
   /* Write to USART CR1 */
   USARTx->CR1 = (uint16_t)tmpreg;
+	
+	 
+	 
+									 
 
 /*---------------------------- USART CR3 Configuration -----------------------*/  
   tmpreg = USARTx->CR3;

@@ -4,14 +4,32 @@
 #include "stm32f10x.h"
 #include <stdio.h>
 
-extern u8 RxData,flag;
+#define MAX_BUFFER_SIZE 256
 
-void uart_inint(u32 bound);//串口初始化
-void USART1_IRQHandler(void);//中断接受
 
-void uart_putc(char c);//发送一个字符
-void uart_puts(char *str);//发送字符串
 
+typedef struct
+{
+     int8_t buffer[MAX_BUFFER_SIZE];
+     int8_t* buffer_end;
+     int8_t* data_start;
+     int8_t* data_end;
+     int64_t count;
+     int64_t size;
+ } ring_buffer;
+
+
+
+void USART_Config(void);
+void NVIC_Config(void);
+int32_t Uart_Tx(uint8_t *buf, uint16_t size);
+int8_t RB_pop(ring_buffer* rb);
+int32_t RB_push(ring_buffer* rb, int8_t data);
+int8_t RB_pop(ring_buffer* rb);
+int32_t RB_full(ring_buffer* rb);
+void RB_init(ring_buffer* rb, int64_t size);
+void serial_puts(char *buffer);
+void serial_putc(char ch);
 
 #endif
 

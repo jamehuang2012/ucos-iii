@@ -25,10 +25,11 @@ void leda_task_core(void *pdata)
     
     while(1)
     {
-		printf("LEDA等待信号量\n");
+		//uart_puts("LEDA等待信号量\n");
         OSSemPend(&AppSem,0,OS_OPT_PEND_BLOCKING,&ts,&err);
-        LED_NF((count++)%8);
-        printf("LEDA得到信号量\n");           
+       // LED_NF((count++)%8);
+      //  uart_puts("LEDA得到信号量\n"); 
+				
     }
 }
 
@@ -39,7 +40,7 @@ void ledb_task_core(void *pdata)
 	
     while(1)
     {
-		printf("LEDB释放信号量\n");
+		//uart_puts("LEDB释放信号量\n");
 	 	OSSemPost(&AppSem,OS_OPT_POST_ALL,&err);
 		OSTimeDlyHMSM(0, 0, 1, 0,OS_OPT_TIME_HMSM_STRICT,&err); 
     }

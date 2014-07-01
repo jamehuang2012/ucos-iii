@@ -37,7 +37,8 @@
 #define  BSP_MODULE
 #include <bsp.h>
 #include <includes.h>
-
+#include "usart.h"
+#include "console.h"
 /*
 *********************************************************************************************************
 *                                            LOCAL DEFINES
@@ -150,37 +151,47 @@ void NVIC_Configuration(void)
 {
 	NVIC_InitTypeDef NVIC_InitStructure;
 	
+ 
+  /* Enable the USART2 Interrupt */
+ 
+	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	/* Enable the USART1 Interrupt */
-	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;	 // USART1 全局中断 ;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 
 	NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;	 
-  	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  	NVIC_Init(&NVIC_InitStructure);
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 }
+
+ring_buffer uart_buffer;
+ring_buffer Uart_Rxbuffer;
 
 void  BSP_Init (void)
 {
+	/* Initialize Circular buffer for UART */
+	RB_init(&uart_buffer,MAX_BUFFER_SIZE);
+	RB_init(&Uart_Rxbuffer,MAX_BUFFER_SIZE);
 	GPIO_Configuration();
 	EXTI_Config();
 	NVIC_Configuration();
-
+  USART_Config();
+	
 	RCC->APB2ENR|=1<<4;    //使能PORTC时钟
 	GPIOC->CRH&=0XFF0FFFFF;
 	GPIOC->CRH|=0X00300000;//PC13推挽输出
 	GPIOC->ODR|=1<<13;      //PC13输出高
 
 	LED_Init();
-	uart_inint(9600);
-	//Stat_Time_Init();
-	//STM3210E_LCD_Init();
-	//LCD_Clear(White);	
+	console_init();
+	
+	Uart_Tx("test\r\n",6);
+	
 }
 
 
